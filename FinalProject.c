@@ -5,6 +5,9 @@ volatile int pixel_buffer_start;
 
 void clear_screen();
 void wait_for_vsync();
+void plot_pixel(int x, int y, short int line_color);
+void changePlayerPos();
+void draw();
 //declare global variables on objects
 
 
@@ -23,10 +26,13 @@ int obstacal_ONCHIP_y[20];
 
 //location of player
 
+board[1][1] = 1; // when theres a 1 on the board, that means theres a player on it
+
+
 int player_x, player_y;
-int playerMov;
-int player_SDRAM;
-int player_ONCHIP;
+int playerMov_x, playerMov_y;
+int player_SDRAM_x, player_SDRAM_y;
+int player_ONCHIP_x, player_SDRAM_y;
 
 bool gameOver = false; // initialize game status
 
@@ -57,6 +63,9 @@ int main(void) {
 
 while(1){
 
+  changePlayerPos();
+
+
 
   wait_for_vsync();
   pixel_buffer_start = *(pixel_ctrl_ptr + 1); //new back buffer
@@ -66,6 +75,42 @@ while(1){
 
 
 }
+
+
+void changePlayerPos(){
+
+int i, j;
+
+for( i = 0 ; i < 3; i++){
+  for( j = 0; j < 3; j++){
+    if(board[i][j] == 1){
+      player_x = 114 + (i * 30);
+      player_y = 74 + (j*30);
+    }
+
+
+  }
+}
+
+}
+
+
+void draw(){
+
+int i, j;
+
+for(i = 0; i < 20 ; i ++){
+
+  //draw each obstacle subroutine
+}
+
+//draw player subroutine
+
+}
+
+
+
+
 
 void plot_pixel(int x, int y, short int line_color)
 {
