@@ -61,10 +61,19 @@ int main(void) {
   //initialize and load sprites here
 
 
+
+
+
 while(1){
 
-  changePlayerPos();
 
+  if(gameOver){
+    break;
+  }
+  clear();
+  changePlayerPos();
+  draw();
+  update();
 
 
   wait_for_vsync();
@@ -93,6 +102,17 @@ for( i = 0 ; i < 3; i++){
 }
 
 }
+
+void clear(){
+
+
+
+
+
+
+
+}
+
 
 
 void draw(){
