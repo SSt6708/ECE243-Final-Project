@@ -1,8 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include "board.h"
+#include "obstacle.h"
+#include "player.h"
+
+
+
 
 volatile int pixel_buffer_start;
 
+void drawBackground();
 void clear_screen();
 void wait_for_vsync();
 void plot_pixel(int x, int y, short int line_color);
@@ -59,7 +66,7 @@ int main(void) {
 
 
   //initialize and load sprites here
-
+drawBackground();
 
 
 
@@ -84,6 +91,21 @@ while(1){
 
 
 }
+
+void drawBackground(){
+
+  int i = 0;
+  for (; i < 320; i++) {
+    int j = 0;
+    for (; j < 240; j++) {
+      plot_pixel(i, j, 0x0000);
+    }
+  }
+
+
+
+}
+
 
 
 void changePlayerPos(){
