@@ -37,7 +37,6 @@ int obstacal_ONCHIP_y[20];
 
 //location of player
 
-boards[1][1] = 1; // when theres a 1 on the board, that means theres a player on it
 
 
 int player_x, player_y;
@@ -55,6 +54,8 @@ int level = 1; //initialize game level
 
 
 int main(void) {
+  boards[1][1] = 1; // when theres a 1 on the board, that means theres a player on it
+
 
     volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
 
