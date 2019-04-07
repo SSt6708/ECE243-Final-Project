@@ -28,7 +28,7 @@ OCFLAGS		:= -O srec
 
 # Files
 HDRS		:=
-SRCS		:= FinalProject.c address_map_arm.h board.h obstacle.h player.h
+SRCS		:= FinalProject.c
 OBJS		:= $(patsubst %, %.o, $(SRCS))
 
 # Targets

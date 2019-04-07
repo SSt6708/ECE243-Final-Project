@@ -14,6 +14,7 @@ void drawBoard(int xPos, int yPos);
 void clear_screen();
 void wait_for_vsync();
 void changePlayerPos();
+void update();
 void clear();
 void plot_pixel(int x, int y, short int line_color);
 void changePlayerPos();
