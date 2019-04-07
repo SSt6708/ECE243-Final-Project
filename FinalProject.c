@@ -22,7 +22,7 @@ void draw();
 //declare global variables on objects
 
 
-int boards[3][3] = {0};
+int boards[3][3];
 //location of obsticals
 //total of 20 obstacles
 int obstacal_x[20];
