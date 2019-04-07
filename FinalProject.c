@@ -10,11 +10,15 @@
 volatile int pixel_buffer_start;
 
 void drawBackground();
+void drawBoard(int xPos, int yPos);
 void clear_screen();
 void wait_for_vsync();
+void changePlayerPos();
+void clear();
 void plot_pixel(int x, int y, short int line_color);
 void changePlayerPos();
 void draw();
+
 //declare global variables on objects
 
 
@@ -67,7 +71,7 @@ int main(void) {
 
   //initialize and load sprites here
 drawBackground();
-
+drawBoard(114, 74);
 
 
 
@@ -137,6 +141,24 @@ void clear(){
 //hi
 
 
+void drawPlayer(int x, int y){
+
+  int i, j;
+
+  for(i = 0; i < 30; i++){
+    for( j = 0; j < 30; j++){
+
+      plot_pixel( x + j, y + i, player[i*90 + j]);
+
+    }
+  }
+
+
+
+}
+
+
+
 void draw(){
 
 int i, j;
@@ -146,11 +168,25 @@ for(i = 0; i < 20 ; i ++){
   //draw each obstacle subroutine
 }
 
+drawPlayer(player_x, player_y);
 //draw player subroutine
 
 }
 
+void drawBoard( int xPos, int yPos){
 
+    int i, j;
+
+    for(i = 0; i < 90; i++){
+      for( j = 0; j < 90; j++){
+
+        plot_pixel( xPos + j, yPos + i, board[i*90 + j]);
+
+      }
+    }
+
+
+}
 
 
 
