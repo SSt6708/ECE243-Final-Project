@@ -22,7 +22,7 @@ void draw();
 //declare global variables on objects
 
 
-int board[3][3] = {0};
+int boards[3][3] = {0};
 //location of obsticals
 //total of 20 obstacles
 int obstacal_x[20];
@@ -37,7 +37,7 @@ int obstacal_ONCHIP_y[20];
 
 //location of player
 
-board[1][1] = 1; // when theres a 1 on the board, that means theres a player on it
+boards[1][1] = 1; // when theres a 1 on the board, that means theres a player on it
 
 
 int player_x, player_y;
@@ -118,7 +118,7 @@ int i, j;
 
 for( i = 0 ; i < 3; i++){
   for( j = 0; j < 3; j++){
-    if(board[i][j] == 1){
+    if(boards[i][j] == 1){
       player_x = 114 + (i * 30);
       player_y = 74 + (j*30);
     }
