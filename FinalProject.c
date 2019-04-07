@@ -159,7 +159,9 @@ void drawPlayer(int x, int y){
 
 }
 
-
+void update(){
+  
+}
 
 void draw(){
 
