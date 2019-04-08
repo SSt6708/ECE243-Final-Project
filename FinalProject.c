@@ -11,6 +11,8 @@ volatile int pixel_buffer_start;
 
 void drawBackground();
 void drawBoard(int xPos, int yPos);
+void drawPlayer(int x, int y);
+void drawObstacle(int x, int y);
 void clear_screen();
 void wait_for_vsync();
 void changePlayerPos();
@@ -55,7 +57,7 @@ int level = 1; //initialize game level
 
 
 int main(void) {
-  boards[1][1] = 1; // when theres a 1 on the board, that means theres a player on it
+  boards[1][2] = 1; // when theres a 1 on the board, that means theres a player on it
 
 
     volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
@@ -68,7 +70,7 @@ int main(void) {
 
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
-	  clear_screen();
+	  //clear_screen();
 
 
   //initialize and load sprites here
@@ -76,10 +78,37 @@ drawBackground();
 
 
 
+//initialize all the obstacles
+int i;
+for( i = 0; i < 12; i++){
+
+//try to do horizontal movement first
+    if(i%2 == 0){
+      obstacal_x[i] = 0; //- rand()%70;
+      obstacal_y[i] = rand()%240;
+      obstacleMov_x[i] = 1;
+      obstacleMov_y[i] = 0;
+    }else{
+      obstacal_x[i] = 310; //+ rand()%70;
+      obstacal_y[i] = rand()%240;
+      obstacleMov_x[i] = -1;
+      obstacleMov_y[i] = 0;
+    }
+
+
+
+
+
+
+}
+
+
+
+
 
 while(1){
-drawBoard(114, 74);
 
+drawBoard(114, 74);
   if(gameOver){
     break;
   }
@@ -142,6 +171,21 @@ void clear(){
 }
 //hi
 
+void drawObstacle(int x, int y){
+
+  int i, j;
+
+  for(i = 0; i < 30; i++){
+    for( j = 0; j < 30; j++){
+
+      plot_pixel( x + j, y + i, obstacle[i*30 + j]);
+
+    }
+  }
+
+}
+
+
 
 void drawPlayer(int x, int y){
 
@@ -161,16 +205,29 @@ void drawPlayer(int x, int y){
 
 void update(){
 
+int i ;
+for(i = 0; i < 12; i++){
+
+obstacal_x[i] += obstacleMov_x[i];
+
+
+
+
+
+}
+
+
 }
 
 void draw(){
 
 int i, j;
 
-//for(i = 0; i < 20 ; i ++){
-
-  //draw each obstacle subroutine
-//}
+for(i = 0; i < 12; i++){
+    if(obstacal_x[i] >= 0 && obstacal_x[i] <= 320){
+      drawObstacle(obstacal_x[i], obstacal_y[i]);
+    }
+}
 
 drawPlayer(player_x, player_y);
 //draw player subroutine
