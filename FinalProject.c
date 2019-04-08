@@ -17,7 +17,7 @@ void clear_screen();
 void wait_for_vsync();
 void changePlayerPos();
 void update();
-void clear();
+void clearObstacle();
 void plot_pixel(int x, int y, short int line_color);
 void changePlayerPos();
 void draw();
@@ -70,7 +70,7 @@ int main(void) {
 
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
-	  //clear_screen();
+	  clear_screen();
 
 
   //initialize and load sprites here
@@ -83,16 +83,30 @@ int i;
 for( i = 0; i < 12; i++){
 
 //try to do horizontal movement first
-    if(i%2 == 0){
-      obstacal_x[i] = 0; //- rand()%70;
-      obstacal_y[i] = rand()%240;
+    if(i%4 == 0){
+      obstacal_x[i] = 0 - rand()%70;
+      obstacal_y[i] = 74 + (rand()%3)*30;
       obstacleMov_x[i] = 1;
       obstacleMov_y[i] = 0;
-    }else{
-      obstacal_x[i] = 310; //+ rand()%70;
-      obstacal_y[i] = rand()%240;
+    }else if(i%4 == 1){
+      obstacal_x[i] = 310 + rand()%70;
+      obstacal_y[i] = 74 + (rand()%3)*30;
       obstacleMov_x[i] = -1;
       obstacleMov_y[i] = 0;
+    }else if (i%4 == 2){
+
+      obstacal_x[i] = 114 + (rand()%3)*30; //+ rand()%70;
+      obstacal_y[i] = 0- rand()%70;
+      obstacleMov_x[i] = 0;
+      obstacleMov_y[i] = 1;
+
+
+    }else{
+      obstacal_x[i] = 114 + (rand()%3)*30; //+ rand()%70;
+      obstacal_y[i] = 239 + rand()%70;
+      obstacleMov_x[i] = 0;
+      obstacleMov_y[i] = -1;
+
     }
 
 
@@ -107,17 +121,19 @@ for( i = 0; i < 12; i++){
 
 
 while(1){
-
+clear_screen();
 drawBoard(114, 74);
   if(gameOver){
     break;
   }
-//  clear();
+
   changePlayerPos();
+
+
   draw();
   update();
 
-
+//clearObstacle();
   wait_for_vsync();
   pixel_buffer_start = *(pixel_ctrl_ptr + 1); //new back buffer
 }
@@ -160,14 +176,23 @@ for( i = 0 ; i < 3; i++){
 
 }
 
-void clear(){
+void clearObstacle(){
+
+  int i, k, j;
+  for( i = 0; i < 12 ; i++){
+
+    for(k = 0; k < 30; k++){
+      for( j = 0; j < 30; j++){
+
+        plot_pixel( obstacal_x[i] + j, obstacal_y[i] + k, 0x0000);
+
+      }
+    }
 
 
 
 
-
-
-
+  }
 }
 //hi
 
@@ -178,7 +203,10 @@ void drawObstacle(int x, int y){
   for(i = 0; i < 30; i++){
     for( j = 0; j < 30; j++){
 
-      plot_pixel( x + j, y + i, obstacle[i*30 + j]);
+      if(obstacle[i*30+j] != 0xFFFF){
+        plot_pixel( x + j, y + i, obstacle[i*30 + j]); //only draw the color part
+      }
+
 
     }
   }
@@ -209,7 +237,7 @@ int i ;
 for(i = 0; i < 12; i++){
 
 obstacal_x[i] += obstacleMov_x[i];
-
+obstacal_y[i] += obstacleMov_y[i];
 
 
 
@@ -224,7 +252,7 @@ void draw(){
 int i, j;
 
 for(i = 0; i < 12; i++){
-    if(obstacal_x[i] >= 0 && obstacal_x[i] <= 320){
+    if((obstacal_x[i] >= 0 && obstacal_x[i] <= 320) && (obstacal_y[i] >= 0 && obstacal_y[i] <= 240)){
       drawObstacle(obstacal_x[i], obstacal_y[i]);
     }
 }
