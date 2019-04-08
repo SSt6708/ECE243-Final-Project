@@ -45,7 +45,7 @@ int obstacal_ONCHIP_y[20];
 int player_x, player_y;
 int playerMov_x, playerMov_y;
 int player_SDRAM_x, player_SDRAM_y;
-int player_ONCHIP_x, player_SDRAM_y;
+int player_ONCHIP_x, player_ONCHIP_y;
 
 bool gameOver = false; // initialize game status
 
@@ -88,11 +88,28 @@ for( i = 0; i < 12; i++){
       obstacal_y[i] = 74 + (rand()%3)*30;
       obstacleMov_x[i] = 1;
       obstacleMov_y[i] = 0;
+
+      obstacal_ONCHIP_x[i] = obstacal_x[i];
+      obstacal_ONCHIP_y[i] = obstacal_y[i];
+      obstacal_SDRAM_x[i] = obstacal_x[i];
+      obstacal_SDRAM_y[i] = obstacal_y[i];
+
+
+
+
     }else if(i%4 == 1){
       obstacal_x[i] = 310 + rand()%300;
       obstacal_y[i] = 74 + (rand()%3)*30;
       obstacleMov_x[i] = -1;
       obstacleMov_y[i] = 0;
+
+      obstacal_ONCHIP_x[i] = obstacal_x[i];
+      obstacal_ONCHIP_y[i] = obstacal_y[i];
+      obstacal_SDRAM_x[i] = obstacal_x[i];
+      obstacal_SDRAM_y[i] = obstacal_y[i];
+
+
+
     }else if (i%4 == 2){
 
       obstacal_x[i] = 114 + (rand()%3)*30; //+ rand()%70;
@@ -100,12 +117,25 @@ for( i = 0; i < 12; i++){
       obstacleMov_x[i] = 0;
       obstacleMov_y[i] = 1;
 
+      obstacal_ONCHIP_x[i] = obstacal_x[i];
+      obstacal_ONCHIP_y[i] = obstacal_y[i];
+      obstacal_SDRAM_x[i] = obstacal_x[i];
+      obstacal_SDRAM_y[i] = obstacal_y[i];
+
 
     }else{
       obstacal_x[i] = 114 + (rand()%3)*30; //+ rand()%70;
       obstacal_y[i] = 239 + rand()%300;
       obstacleMov_x[i] = 0;
       obstacleMov_y[i] = -1;
+
+      obstacal_ONCHIP_x[i] = obstacal_x[i];
+      obstacal_ONCHIP_y[i] = obstacal_y[i];
+      obstacal_SDRAM_x[i] = obstacal_x[i];
+      obstacal_SDRAM_y[i] = obstacal_y[i];
+
+
+
 
     }
 
@@ -121,7 +151,10 @@ for( i = 0; i < 12; i++){
 
 
 while(1){
-clear_screen();
+
+
+//clear_screen();
+clearObstacle();
 drawBoard(114, 74);
   if(gameOver){
     break;
@@ -133,7 +166,7 @@ drawBoard(114, 74);
   draw();
   update();
 
-//clearObstacle();
+
   wait_for_vsync();
   pixel_buffer_start = *(pixel_ctrl_ptr + 1); //new back buffer
 }
@@ -168,6 +201,11 @@ for( i = 0 ; i < 3; i++){
     if(boards[i][j] == 1){
       player_x = 114 + (i * 30);
       player_y = 74 + (j*30);
+
+      player_ONCHIP_x = player_x;
+      player_ONCHIP_y = player_y;
+      player_SDRAM_x = player_x;
+      player_SDRAM_y = player_y;
     }
 
 
@@ -175,24 +213,47 @@ for( i = 0 ; i < 3; i++){
 }
 
 }
-
+// 0 is on chip 1 is SDRam
 void clearObstacle(){
 
   int i, k, j;
-  for( i = 0; i < 12 ; i++){
 
-    for(k = 0; k < 30; k++){
-      for( j = 0; j < 30; j++){
+  int type;
 
-        plot_pixel( obstacal_x[i] + j, obstacal_y[i] + k, 0x0000);
+  if(pixel_buffer_start == 0xC0000000){
+    type = 1;
+  }else if(pixel_buffer_start == 0xC8000000){
+    type = 0;
+  }
 
+
+
+
+
+  if(type == 0){
+    for( i = 0; i < 12 ; i++){
+
+      for(k = 0; k < 30; k++){
+        for( j = 0; j < 30; j++){
+
+          plot_pixel( obstacal_ONCHIP_x[i] + j, obstacal_ONCHIP_y[i] + k, 0x0000);
+
+        }
       }
     }
+  }else if(type == 1){
+    for( i = 0; i < 12 ; i++){
 
+      for(k = 0; k < 30; k++){
+        for( j = 0; j < 30; j++){
 
+          plot_pixel( obstacal_SDRAM_x[i] + j, obstacal_SDRAM_y[i] + k, 0x0000);
 
-
+        }
+      }
   }
+  }
+
 }
 //hi
 
@@ -234,7 +295,18 @@ void drawPlayer(int x, int y){
 void update(){
 
 int i ;
+
 for(i = 0; i < 12; i++){
+
+    if(pixel_buffer_start == 0xC0000000){
+      obstacal_SDRAM_x[i] = obstacal_x[i];
+      obstacal_SDRAM_y[i] = obstacal_y[i];
+    }else if (pixel_buffer_start == 0xC8000000){
+      obstacal_ONCHIP_x[i] = obstacal_x[i];
+      obstacal_ONCHIP_y[i] = obstacal_y[i];
+    }
+
+
 
 obstacal_x[i] += obstacleMov_x[i];
 obstacal_y[i] += obstacleMov_y[i];
