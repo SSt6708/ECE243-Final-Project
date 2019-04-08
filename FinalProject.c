@@ -84,26 +84,26 @@ for( i = 0; i < 12; i++){
 
 //try to do horizontal movement first
     if(i%4 == 0){
-      obstacal_x[i] = 0 - rand()%70;
+      obstacal_x[i] = 0 - rand()%300;
       obstacal_y[i] = 74 + (rand()%3)*30;
       obstacleMov_x[i] = 1;
       obstacleMov_y[i] = 0;
     }else if(i%4 == 1){
-      obstacal_x[i] = 310 + rand()%70;
+      obstacal_x[i] = 310 + rand()%300;
       obstacal_y[i] = 74 + (rand()%3)*30;
       obstacleMov_x[i] = -1;
       obstacleMov_y[i] = 0;
     }else if (i%4 == 2){
 
       obstacal_x[i] = 114 + (rand()%3)*30; //+ rand()%70;
-      obstacal_y[i] = 0- rand()%70;
+      obstacal_y[i] = 0- rand()%300;
       obstacleMov_x[i] = 0;
       obstacleMov_y[i] = 1;
 
 
     }else{
       obstacal_x[i] = 114 + (rand()%3)*30; //+ rand()%70;
-      obstacal_y[i] = 239 + rand()%70;
+      obstacal_y[i] = 239 + rand()%300;
       obstacleMov_x[i] = 0;
       obstacleMov_y[i] = -1;
 
@@ -239,7 +239,29 @@ for(i = 0; i < 12; i++){
 obstacal_x[i] += obstacleMov_x[i];
 obstacal_y[i] += obstacleMov_y[i];
 
+if(obstacal_x[i] >320 && obstacleMov_x[i] == 1){
+  obstacleMov_x[i] = -1;
+  obstacal_x[i] = 310 + rand()%300;
+  continue;
+}
 
+if(obstacal_x[i] <0 && obstacleMov_x[i] == -1){
+  obstacleMov_x[i] = 1;
+  obstacal_x[i] = 0 - rand()%300;
+  continue;
+}
+
+if(obstacal_y[i] < 0 && obstacleMov_y[i] == -1){
+  obstacleMov_y[i] = 1;
+  obstacal_y[i] = 0 - rand()%300;
+  continue;
+}
+
+if(obstacal_y[i] > 240 && obstacleMov_y[i] == 1){
+  obstacleMov_y[i] = -1;
+  obstacal_y[i] = 240 + rand()%300;
+  continue;
+}
 
 
 }
