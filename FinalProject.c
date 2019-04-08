@@ -73,17 +73,17 @@ int main(void) {
 
   //initialize and load sprites here
 drawBackground();
-drawBoard(114, 74);
+
 
 
 
 while(1){
-
+drawBoard(114, 74);
 
   if(gameOver){
     break;
   }
-  clear();
+//  clear();
   changePlayerPos();
   draw();
   update();
@@ -150,7 +150,7 @@ void drawPlayer(int x, int y){
   for(i = 0; i < 30; i++){
     for( j = 0; j < 30; j++){
 
-      plot_pixel( x + j, y + i, player[i*90 + j]);
+      plot_pixel( x + j, y + i, player[i*30 + j]);
 
     }
   }
@@ -160,17 +160,17 @@ void drawPlayer(int x, int y){
 }
 
 void update(){
-  
+
 }
 
 void draw(){
 
 int i, j;
 
-for(i = 0; i < 20 ; i ++){
+//for(i = 0; i < 20 ; i ++){
 
   //draw each obstacle subroutine
-}
+//}
 
 drawPlayer(player_x, player_y);
 //draw player subroutine
