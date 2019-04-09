@@ -4,12 +4,13 @@
 #include "obstacle.h"
 #include "player.h"
 #include "address_map_arm.h"
-
+#include "gameOver.h"
 
 
 volatile int pixel_buffer_start;
 
 void drawBackground();
+void drawGameOver();
 void drawBoard(int xPos, int yPos);
 void drawPlayer(int x, int y);
 void drawObstacle(int x, int y);
@@ -47,7 +48,7 @@ int playerMov_x, playerMov_y;
 int player_SDRAM_x, player_SDRAM_y;
 int player_ONCHIP_x, player_ONCHIP_y;
 
-bool gameOver = false; // initialize game status
+bool over = false; // initialize game status
 
 int level = 1; //initialize game level
 
@@ -157,21 +158,24 @@ int main(void) {
 
 	while (1) {
 
+	  //clear_screen();
+
+  /*  if(!over){
+      clearObstacle();
+      drawBoard(114, 74);
 
 
-		//clear_screen();
-		clearObstacle();
-		drawBoard(114, 74);
-		if (gameOver) {
-			break;
-		}
+
+      changePlayerPos();
 
 
-		changePlayerPos();
+      draw();
+      update();
+    }else{
+      drawGameOver();
+    }*/
+    drawGameOver();
 
-
-		draw();
-		update();
 
 
 		wait_for_vsync();
@@ -179,6 +183,21 @@ int main(void) {
 	}
 
 
+return 0;
+
+
+}
+
+void drawGameOver(){
+
+  int i = 0;
+  int j = 0;
+  for (; i < 320; i++) {
+
+    for (; j < 240; j++) {
+      plot_pixel(i, j, gameOver[ j*320 + i]);
+    }
+  }
 
 
 }
@@ -308,6 +327,7 @@ void drawPlayer(int x, int y) {
 
 }
 
+
 void update() {
 
 	int i;
@@ -327,6 +347,11 @@ void update() {
 
 		obstacal_x[i] += obstacleMov_x[i];
 		obstacal_y[i] += obstacleMov_y[i];
+
+    if(obstacal_x[i] == player_x && obstacal_y[i] == player_y){
+      over = true;
+      break;
+    }
 
 		if (obstacal_x[i] > 320 && obstacleMov_x[i] == 1) {
 			obstacleMov_x[i] = -1;
