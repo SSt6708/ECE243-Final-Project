@@ -73,15 +73,11 @@ int main(void) {
 	clear_screen();
 
 
-<<<<<<< HEAD
-  //initialize and load sprites here
-drawBackground();
-drawBoard(114, 74);
-=======
+
 	//initialize and load sprites here
 	drawBackground();
 
->>>>>>> 5901b48956b097a7330678c8b61fbed3eab4c269
+
 
 
 	//initialize all the obstacles
@@ -162,21 +158,14 @@ drawBoard(114, 74);
 	while (1) {
 
 
-<<<<<<< HEAD
-clear_screen();
-//clearObstacle();
-drawBoard(114, 74);
-  if(gameOver){
-    break;
-  }
-=======
+
 		//clear_screen();
 		clearObstacle();
 		drawBoard(114, 74);
 		if (gameOver) {
 			break;
 		}
->>>>>>> 5901b48956b097a7330678c8b61fbed3eab4c269
+
 
 		changePlayerPos();
 
@@ -255,11 +244,11 @@ void clearObstacle() {
 			for (k = 0; k < 30; k++) {
 				for (j = 0; j < 30; j++) {
 
-					if (obstacal_ONCHIP_x[i] + j < 320 && obstacal_ONCHIP_x[i] + j >= 0 
+					if (obstacal_ONCHIP_x[i] + j < 320 && obstacal_ONCHIP_x[i] + j >= 0
 							&& obstacal_ONCHIP_y[i] + k < 240 && obstacal_ONCHIP_y[i] + k >= 0) {
 						plot_pixel(obstacal_ONCHIP_x[i] + j, obstacal_ONCHIP_y[i] + k, 0x0000);
 					}
-			
+
 
 				}
 			}
@@ -274,7 +263,7 @@ void clearObstacle() {
 					if (obstacal_SDRAM_x[i] + j < 320 && obstacal_SDRAM_x[i] + j >= 0
 						&& obstacal_SDRAM_y[i] + k < 240 && obstacal_SDRAM_y[i] + k >= 0) {
 						plot_pixel(obstacal_SDRAM_x[i] + j, obstacal_SDRAM_y[i] + k, 0x0000);
-					}	
+					}
 
 				}
 			}
