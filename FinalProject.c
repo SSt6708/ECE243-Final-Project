@@ -4,7 +4,7 @@
 #include "obstacle.h"
 #include "player.h"
 #include "address_map_arm.h"
-#include "gameOver.h"
+#include "gameover.h"
 
 
 volatile int pixel_buffer_start;
@@ -160,7 +160,7 @@ int main(void) {
 
 	  //clear_screen();
 
-  /*  if(!over){
+
       clearObstacle();
       drawBoard(114, 74);
 
@@ -171,10 +171,9 @@ int main(void) {
 
       draw();
       update();
-    }else{
-      drawGameOver();
-    }*/
-    drawGameOver();
+  
+
+    //drawGameOver();
 
 
 
