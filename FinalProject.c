@@ -75,7 +75,7 @@ int main(void) {
 
   //initialize and load sprites here
 drawBackground();
-
+drawBoard(114, 74);
 
 
 //initialize all the obstacles
@@ -153,8 +153,8 @@ for( i = 0; i < 12; i++){
 while(1){
 
 
-//clear_screen();
-clearObstacle();
+clear_screen();
+//clearObstacle();
 drawBoard(114, 74);
   if(gameOver){
     break;
