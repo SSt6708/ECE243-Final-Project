@@ -71,20 +71,21 @@ int main(void) {
 	volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
 
 	*(pixel_ctrl_ptr + 1) = 0xC8000000; // first store the address in the
-			 // back buffer
+										// back buffer
 	wait_for_vsync();
 	//*(timer + 3) = 0xE100;
 	//*(timer + 3) = 0x5F5;
 	pixel_buffer_start = *pixel_ctrl_ptr;
-
+	drawBackground();
 	*(pixel_ctrl_ptr + 1) = 0xC0000000;
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
-	clear_screen();
+
 
 
 
 	//initialize and load sprites here
-	drawBackground();
+	//	clear_screen();
+
 
 	*timer = int_timer;
 	//*(timer + 1) = 0b011;
@@ -168,9 +169,11 @@ int main(void) {
 
 	while (1) {
 
+		if (time > 0)
+			break;
 		//clear_screen();
 		check_timer();
-		//  time = *(timer + 2);
+		//		time = *(timer + 2);
 		int t2 = time / 10;
 		int t1 = time % 10;
 		*HEX = seg7[t1] | seg7[t2] << 8;
@@ -194,8 +197,14 @@ int main(void) {
 		wait_for_vsync();
 		pixel_buffer_start = *(pixel_ctrl_ptr + 1); //new back buffer
 	}
+	//All for gameover
+	wait_for_vsync();
 
-
+	while (1) {
+		drawGameOver();
+		wait_for_vsync();
+		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+	}
 	return 0;
 
 
@@ -204,11 +213,10 @@ int main(void) {
 void drawGameOver() {
 
 	int i = 0;
-	int j = 0;
 	for (; i < 320; i++) {
-
+		int j = 0;
 		for (; j < 240; j++) {
-			plot_pixel(i, j, gameOver[j * 320 + i]);
+			plot_pixel(i, j, gameOver[i + j * 320]);
 		}
 	}
 
@@ -217,14 +225,13 @@ void drawGameOver() {
 
 void drawBackground() {
 
-	int i = 0;
-	for (; i < 320; i++) {
-		int j = 0;
-		for (; j < 240; j++) {
+	int i;
+	for (i = 0; i < 320; i++) {
+		int j;
+		for (j = 0; j < 240; j++) {
 			plot_pixel(i, j, 0x0000);
 		}
 	}
-
 
 
 }
@@ -477,4 +484,3 @@ void check_timer() {
 
 
 }
-
