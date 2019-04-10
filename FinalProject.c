@@ -56,7 +56,9 @@ int player_ONCHIP_x, player_ONCHIP_y;
 bool over = false; // initialize game status
 
 int level = 1; //initialize game level
-
+int time = 0;
+int main_status = 0;
+int int_timer = 150000000;
 //initialize playrt position
 
 //5F5E100
@@ -69,11 +71,10 @@ int main(void) {
 	volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
 
 	*(pixel_ctrl_ptr + 1) = 0xC8000000; // first store the address in the
-										// back buffer
+			 // back buffer
 	wait_for_vsync();
-	*(timer_ptr + 2) = 0b011;
-	*(timer_ptr + 3) = 0xE100;
-	*(timer_ptr + 4) = 0x5F5;
+	//*(timer + 3) = 0xE100;
+	//*(timer + 3) = 0x5F5;
 	pixel_buffer_start = *pixel_ctrl_ptr;
 
 	*(pixel_ctrl_ptr + 1) = 0xC0000000;
@@ -85,8 +86,10 @@ int main(void) {
 	//initialize and load sprites here
 	drawBackground();
 
-
-
+	*timer = int_timer;
+	//*(timer + 1) = 0b011;
+	*(timer + 2) = 0b011;
+	main_status = *(timer + 3);
 
 	//initialize all the obstacles
 	int i;
@@ -165,25 +168,26 @@ int main(void) {
 
 	while (1) {
 
-	  //clear_screen();
+		//clear_screen();
 		check_timer();
-		int t1 = time / 10;
-		int t2 = time % 10
-		*HEX3_0_ptr = seg7[t1] | seg7[t2] << 8;
-		
-      clearObstacle();
-      drawBoard(114, 74);
+		//  time = *(timer + 2);
+		int t2 = time / 10;
+		int t1 = time % 10;
+		*HEX = seg7[t1] | seg7[t2] << 8;
+
+		clearObstacle();
+		drawBoard(114, 74);
 
 
 
-      changePlayerPos();
+		changePlayerPos();
 
 
-      draw();
-      update();
-  
+		draw();
+		update();
 
-    //drawGameOver();
+
+		//drawGameOver();
 
 
 
@@ -192,21 +196,21 @@ int main(void) {
 	}
 
 
-return 0;
+	return 0;
 
 
 }
 
-void drawGameOver(){
+void drawGameOver() {
 
-  int i = 0;
-  int j = 0;
-  for (; i < 320; i++) {
+	int i = 0;
+	int j = 0;
+	for (; i < 320; i++) {
 
-    for (; j < 240; j++) {
-      plot_pixel(i, j, gameOver[ j*320 + i]);
-    }
-  }
+		for (; j < 240; j++) {
+			plot_pixel(i, j, gameOver[j * 320 + i]);
+		}
+	}
 
 
 }
@@ -273,7 +277,7 @@ void clearObstacle() {
 				for (j = 0; j < 30; j++) {
 
 					if (obstacal_ONCHIP_x[i] + j < 320 && obstacal_ONCHIP_x[i] + j >= 0
-							&& obstacal_ONCHIP_y[i] + k < 240 && obstacal_ONCHIP_y[i] + k >= 0) {
+						&& obstacal_ONCHIP_y[i] + k < 240 && obstacal_ONCHIP_y[i] + k >= 0) {
 						plot_pixel(obstacal_ONCHIP_x[i] + j, obstacal_ONCHIP_y[i] + k, 0x0000);
 					}
 
@@ -357,10 +361,10 @@ void update() {
 		obstacal_x[i] += obstacleMov_x[i];
 		obstacal_y[i] += obstacleMov_y[i];
 
-    if(obstacal_x[i] == player_x && obstacal_y[i] == player_y){
-      over = true;
-      break;
-    }
+		if (obstacal_x[i] == player_x && obstacal_y[i] == player_y) {
+			over = true;
+			break;
+		}
 
 		if (obstacal_x[i] > 320 && obstacleMov_x[i] == 1) {
 			obstacleMov_x[i] = -1;
@@ -454,13 +458,23 @@ void wait_for_vsync() {
 }
 
 void check_timer() {
-	int status = *(timer_ptr + 3);
-	while ((status & 0x01) == 0) {
-		status = *(timer_ptr + 3);
+	int status;
+
+	status = *(timer + 3);
+	if ((status & 0x01) == 0) {
+		status = *(timer + 3);
+		return;
 	}
-	*(timer_ptr + 3) = status;
+	*(timer + 3) = status;
 	time++;
+
+	if (time == 30) {
+		time = 0;
+		level++;
+	}
+
 	return;
 
 
 }
+
