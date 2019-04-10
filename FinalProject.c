@@ -9,6 +9,10 @@
 
 volatile int pixel_buffer_start;
 
+volatile int* key = 0xFF200050;
+volatile int* timer = 0xFFFEC600;
+volatile int* HEX = 0xFF200020;
+
 void drawBackground();
 void drawGameOver();
 void drawBoard(int xPos, int yPos);
