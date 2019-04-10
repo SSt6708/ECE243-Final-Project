@@ -27,6 +27,7 @@ void plot_pixel(int x, int y, short int line_color);
 void changePlayerPos();
 void draw();
 void check_timer();
+bool inBound(int x, int y);
 
 //declare global variables on objects
 
@@ -62,11 +63,26 @@ int int_timer = 150000000;
 //initialize playrt position
 
 //5F5E100
-
+int moveType; //1up, 2down, 3left, 4right
 
 int main(void) {
-	boards[1][2] = 1; // when theres a 1 on the board, that means theres a player on it
+	
+	unsigned char byte1 = 0;
+	unsigned char byte2 = 0;
+	unsigned char byte3 = 0;
+	bool pressed = false;
+	
+  	volatile int * PS2_ptr = (int *) 0xFF200100;  // PS/2 port address
 
+	int PS2_data, RVALID;
+	//
+	unsigned char prevKey = 0;
+	
+	int board_x, board_y;
+	
+	boards[1][2] = 1; // when theres a 1 on the board, that means theres a player on it
+	board_x = 1;
+	board_y = 2;
 
 	volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
 
@@ -84,7 +100,7 @@ int main(void) {
 
 
 	//initialize and load sprites here
-	//	clear_screen();
+	clear_screen();
 
 
 	*timer = int_timer;
@@ -94,11 +110,11 @@ int main(void) {
 
 	//initialize all the obstacles
 	int i;
-	for (i = 0; i < 12; i++) {
+	for (i = 0; i < 20; i++) {
 
 		//try to do horizontal movement first
 		if (i % 4 == 0) {
-			obstacal_x[i] = 0 - rand() % 300;
+			obstacal_x[i] = -450 - rand()%400 + rand()%100;
 			obstacal_y[i] = 74 + (rand() % 3) * 30;
 			obstacleMov_x[i] = 1;
 			obstacleMov_y[i] = 0;
@@ -113,7 +129,7 @@ int main(void) {
 
 		}
 		else if (i % 4 == 1) {
-			obstacal_x[i] = 310 + rand() % 300;
+			obstacal_x[i] = 310 + rand() % 300 + rand()%500;
 			obstacal_y[i] = 74 + (rand() % 3) * 30;
 			obstacleMov_x[i] = -1;
 			obstacleMov_y[i] = 0;
@@ -129,7 +145,7 @@ int main(void) {
 		else if (i % 4 == 2) {
 
 			obstacal_x[i] = 114 + (rand() % 3) * 30; //+ rand()%70;
-			obstacal_y[i] = 0 - rand() % 300;
+			obstacal_y[i] = -760- rand()%500 + rand()%100;
 			obstacleMov_x[i] = 0;
 			obstacleMov_y[i] = 1;
 
@@ -142,7 +158,7 @@ int main(void) {
 		}
 		else {
 			obstacal_x[i] = 114 + (rand() % 3) * 30; //+ rand()%70;
-			obstacal_y[i] = 239 + rand() % 300;
+			obstacal_y[i] = 500 + rand()%700 - rand()%100;
 			obstacleMov_x[i] = 0;
 			obstacleMov_y[i] = -1;
 
@@ -169,14 +185,98 @@ int main(void) {
 
 	while (1) {
 
-		if (time > 0)
-			break;
+		
 		//clear_screen();
+		
+		
+		//read from ps2 keyboard 
+		if(byte2 == 0xF0){
+			pressed = false;
+		}
+		PS2_data = *(PS2_ptr);	// read the Data register in the PS/2 port
+		RVALID = (PS2_data & 0x8000);	// extract the RVALID field
+		if (RVALID != 0)
+		{
+			/* always save the last three bytes received */
+			byte1 = byte2;
+			byte2 = byte3;
+			byte3 = PS2_data & 0xFF;
+		}
+		if ( (byte2 == 0xAA) && (byte3 == 0x00) )
+		{
+			// mouse inserted; initialize sending of data
+			*(PS2_ptr) = 0xF4;
+		}	
+		
+		
+		if(byte2 == 0xF0){
+			pressed = true;
+		}
+		
+	if(!pressed){	
+		if(byte3 == 0x1D){ //w
+			
+			moveType = 1;
+			if(inBound(board_x, board_y-1)){
+				boards[board_x][board_y] = 0;
+				board_y--;
+				boards[board_x][board_y] =1;
+			}
+			pressed = true;
+			prevKey = byte3;
+		}
+		
+		if(byte3 == 0x1B){ //s
+			
+			moveType = 2;
+			if(inBound(board_x, board_y+1)){
+				boards[board_x][board_y] = 0;
+				board_y++;
+				boards[board_x][board_y] =1;
+			}
+			
+			pressed = true;
+			prevKey = byte3;
+		}
+		
+		if(byte3 == 0x1C){ //a
+			
+			moveType = 3;
+			if(inBound(board_x-1, board_y)){
+				boards[board_x][board_y] = 0;
+				board_x--;
+				boards[board_x][board_y] =1;
+			}
+			pressed = true;
+			prevKey = byte3;
+		}
+		
+		if(byte3 == 0x23){ //d
+			
+			moveType = 4;
+			if(inBound(board_x+1, board_y)){
+				boards[board_x][board_y] = 0;
+				board_x++;
+				boards[board_x][board_y] =1;
+			}
+			pressed = true;
+			prevKey = byte3;
+		}
+	}
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		check_timer();
 		//		time = *(timer + 2);
 		int t2 = time / 10;
 		int t1 = time % 10;
-		*HEX = seg7[t1] | seg7[t2] << 8;
+		*HEX = seg7[t1] | seg7[t2] << 8 | seg7[level] << 24;
 
 		clearObstacle();
 		drawBoard(114, 74);
@@ -188,7 +288,9 @@ int main(void) {
 
 		draw();
 		update();
-
+		
+		if (over)
+			break;
 
 		//drawGameOver();
 
@@ -201,6 +303,7 @@ int main(void) {
 	wait_for_vsync();
 
 	while (1) {
+		//clear_screen();
 		drawGameOver();
 		wait_for_vsync();
 		pixel_buffer_start = *(pixel_ctrl_ptr + 1);
@@ -208,6 +311,14 @@ int main(void) {
 	return 0;
 
 
+}
+
+
+bool inBound(int x, int y){
+	if(x < 0 || x > 2 || y < 0 || y >2){
+		return false;
+	}else
+		return true;
 }
 
 void drawGameOver() {
@@ -319,7 +430,7 @@ void drawObstacle(int x, int y) {
 	for (i = 0; i < 30; i++) {
 		for (j = 0; j < 30; j++) {
 
-			if (obstacle[i * 30 + j] != 0xFFFF) {
+			if (obstacle[i * 30 + j] != 0xFFFF && obstacle[i * 30 + j] != 0x0000) {
 				plot_pixel(x + j, y + i, obstacle[i * 30 + j]); //only draw the color part
 			}
 
@@ -338,7 +449,10 @@ void drawPlayer(int x, int y) {
 	for (i = 0; i < 30; i++) {
 		for (j = 0; j < 30; j++) {
 
-			plot_pixel(x + j, y + i, player[i * 30 + j]);
+			if(player[i * 30 + j] != 0xFBE4){
+				plot_pixel(x + j, y + i, player[i * 30 + j]);
+			}
+			
 
 		}
 	}
@@ -351,8 +465,29 @@ void drawPlayer(int x, int y) {
 void update() {
 
 	int i;
+	
+	int count = 6;
+	
+	if(level > 1){
+		count = 12;
+	}
+	if(level > 2){
+		count = 15;
+	}
+	if( level > 3){
+		count = 20;
+	}
 
-	for (i = 0; i < 12; i++) {
+	for (i = 0; i < count; i++) {
+		
+		if((player_x == obstacal_x[i]+29 && player_y == obstacal_y[i]) || (player_x + 29 == obstacal_x[i] && player_y == obstacal_y[i]) ||
+		   (player_x == obstacal_x[i] && player_y == obstacal_y[i] + 29) || (player_x  == obstacal_x[i] && player_y + 29  == obstacal_y[i])){
+			   over = true; //collides, game over
+			   break;
+			   
+		   }
+			
+		
 
 		if (pixel_buffer_start == 0xC0000000) {
 			obstacal_SDRAM_x[i] = obstacal_x[i];
@@ -368,32 +503,33 @@ void update() {
 		obstacal_x[i] += obstacleMov_x[i];
 		obstacal_y[i] += obstacleMov_y[i];
 
-		if (obstacal_x[i] == player_x && obstacal_y[i] == player_y) {
-			over = true;
-			break;
-		}
+		
 
 		if (obstacal_x[i] > 320 && obstacleMov_x[i] == 1) {
 			obstacleMov_x[i] = -1;
-			obstacal_x[i] = 310 + rand() % 300;
+			obstacal_x[i] = 320 + rand() % 500;
+			obstacal_y[i] = 74 + (rand() % 3) * 30;
 			continue;
 		}
 
 		if (obstacal_x[i] < 0 && obstacleMov_x[i] == -1) {
 			obstacleMov_x[i] = 1;
-			obstacal_x[i] = 0 - rand() % 300;
+			obstacal_x[i] = 0 - rand() % 600 - rand()%100;
+			obstacal_y[i] = 74 + (rand() % 3) * 30;
 			continue;
 		}
 
 		if (obstacal_y[i] < 0 && obstacleMov_y[i] == -1) {
 			obstacleMov_y[i] = 1;
 			obstacal_y[i] = 0 - rand() % 300;
+			obstacal_x[i] = 114 + (rand() % 3) * 30;
 			continue;
 		}
 
 		if (obstacal_y[i] > 240 && obstacleMov_y[i] == 1) {
 			obstacleMov_y[i] = -1;
-			obstacal_y[i] = 240 + rand() % 300;
+			obstacal_y[i] = 240 + rand() % 300 + rand()%800;
+			obstacal_x[i] = 114 + (rand() % 3) * 30;
 			continue;
 		}
 
@@ -406,8 +542,20 @@ void update() {
 void draw() {
 
 	int i, j;
+	
+	int count = 6;
+	
+	if(level > 1){
+		count = 12;
+	}
+	if(level > 2){
+		count = 15;
+	}
+	if( level > 3){
+		count = 20;
+	}
 
-	for (i = 0; i < 12; i++) {
+	for (i = 0; i < count; i++) {
 		if ((obstacal_x[i] >= 0 && obstacal_x[i] <= 320) && (obstacal_y[i] >= 0 && obstacal_y[i] <= 240)) {
 			drawObstacle(obstacal_x[i], obstacal_y[i]);
 		}
