@@ -26,10 +26,11 @@ void clearObstacle();
 void plot_pixel(int x, int y, short int line_color);
 void changePlayerPos();
 void draw();
+void check_timer();
 
 //declare global variables on objects
 
-
+int seg7[] = { 0x3F, 0x06,0x5B,0x4F,0x66, 0x6D,0x7D,0x07,0x7F,0x67, 0x77, 0x7C, 0x39, 0x5E, 0x79,0x71 };
 int boards[3][3];
 //location of obsticals
 //total of 20 obstacles
@@ -58,7 +59,7 @@ int level = 1; //initialize game level
 
 //initialize playrt position
 
-
+//5F5E100
 
 
 int main(void) {
@@ -70,7 +71,9 @@ int main(void) {
 	*(pixel_ctrl_ptr + 1) = 0xC8000000; // first store the address in the
 										// back buffer
 	wait_for_vsync();
-
+	*(timer_ptr + 2) = 0b011;
+	*(timer_ptr + 3) = 0xE100;
+	*(timer_ptr + 4) = 0x5F5;
 	pixel_buffer_start = *pixel_ctrl_ptr;
 
 	*(pixel_ctrl_ptr + 1) = 0xC0000000;
@@ -163,8 +166,11 @@ int main(void) {
 	while (1) {
 
 	  //clear_screen();
-
-
+		check_timer();
+		int t1 = time / 10;
+		int t2 = time % 10
+		*HEX3_0_ptr = seg7[t1] | seg7[t2] << 8;
+		
       clearObstacle();
       drawBoard(114, 74);
 
@@ -445,4 +451,16 @@ void wait_for_vsync() {
 		status = *(pixel_ctrl_ptr + 3);
 	}
 	return;
+}
+
+void check_timer() {
+	int status = *(timer_ptr + 3);
+	while ((status & 0x01) == 0) {
+		status = *(timer_ptr + 3);
+	}
+	*(timer_ptr + 3) = status;
+	time++;
+	return;
+
+
 }
